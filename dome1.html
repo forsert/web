@@ -2,8 +2,54 @@
 <html>
 <head>
     <title></title>
+    <style>
+        *{
+            margin:0;padding:0;
+        }
+        li{list-style:none;}
+        #box li{width:300px;height:30px;background:#ccc;margin:10px 0;border:1px solid #000;}
+    </style>
+    <script>
+    window.onload=function(){
+        // var box=document.getElementById()
+        show.init("box")
+    }
+       ;(function(window){
+        function Show(){};
+        Show.prototype.init=function(id){
+            this.id=document.getElementById(id);
+            this.hide();
+        }
+        Show.prototype.hide=function(){
+            var This=this;
+            document.onclick=function(ev){
+                var ev = ev || window.event;   
+                var Tid=This.id.id;
+                var Eid=ev.target.id;
+                var el=This.id.getElementsByTagName("*");
+                for(var i=0,j=el.length;i<j;i++){
+                    el[i].index=999;
+                };
+
+                if(!(Tid==Eid)){
+                  if(ev.target.index!==999){
+                    This.id.style.display="none";
+                  }
+                }
+            }
+        };
+        window.show=new Show();
+       })(window)
+    </script>
 </head>
 <body>
-
+<ul id="box">
+    <li>
+        <div>324243243</div>
+    </li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
 </body>
 </html>
