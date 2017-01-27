@@ -21,7 +21,7 @@
               This.coord.disx=e.clientX;
               This.coord.disy=e.clientY;
               This.creaettips();
-              This.setTime();
+             
           };
         };
         CopyText.prototype.judge=function(){
@@ -43,7 +43,9 @@
             
         };
         CopyText.prototype.creaettips=function(){
+          console.log(this.count);
             if(!this.count){return};
+            this.count=false;
             this.tips=document.createElement("p");
             this.tips.style.cssText="position:fixed;background:#000;color:#fff;font-size:14px;line-height:24px;padding:0 5px;left:"+(this.coord.disx+20)+"px;top:"+(this.coord.disy+20)+"px;white-space:nowrap;"
              if(document.execCommand){
@@ -57,14 +59,16 @@
              };
              if(this.tips.offsetTop+this.tips.offsetHeight>this.coord.viewH){
                this.tips.style.top=this.coord.disy-this.tips.offsetHeight+"px";
-             }
+             };
+             
+              this.setTime();
         };
         CopyText.prototype.setTime=function(){
             var This=this;
             This.timer=setTimeout(function(){
                 document.body.removeChild(This.tips);
-                count=1;
-                this.timer=null;
+                This.count=true;
+                This.timer=null;
              },2000)
         }
         window.copyText=new CopyText();
