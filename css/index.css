@@ -25,3 +25,7 @@ a:active{color:#323232;}
 .float_right{float:right;}
 .clear_float:after{display:block;content:".";height:0;visibility:hidden;clear:both;}
 .clear_float{*zoom:1;}
+
+
+
+
