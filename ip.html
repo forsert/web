@@ -7,13 +7,13 @@
     window.onload=function(){
         var t=new sid();
         t.init({
-            province:"湖南"
+            id:"silid",
         })
     }
     function sid(){
         this.default={
             id:"silid",
-            province:"北京"
+            tierDisplay:false
         }
     };
     sid.prototype={
@@ -21,6 +21,9 @@
             extend(this.default,opt);
             this.id=document.getElementById(this.default.id);
             this.select=this.id.getElementsByTagName("select");
+            if(this.default.tierDisplay){
+                this.tier();
+            };
             this.ip();
         },
         ip:function(){
@@ -42,7 +45,7 @@
         ajax:function(){
             var This=this;
             ajax({type:"GET",url:"http://www.huanghanlian.com/data_location/list.json"},function(msg){
-                This.order(JSON.parse(msg))
+                This.order(JSON.parse(msg));
             });
         },
         order:function(msg){
@@ -83,14 +86,25 @@
             this.select[0].onchange=function(){
                 This.pro=this.options[this.options.selectedIndex].getAttribute("name");
                 This.city();
-                This.qu()
+                This.qu();
+                if(This.default.tierDisplay){
+                    This.select[1].style.display="inline";
+                };
                 
             };
             this.select[1].onchange=function(){
                  This.pro=this.options[this.options.selectedIndex].getAttribute("name");
-                 This.qu()
+                 This.qu();
+                 if(This.default.tierDisplay){
+                    This.select[2].style.display="inline";
+                };
             }
+        },
+        tier:function(){
+            this.select[1].style.display=this.select[2].style.display="none";
+            
         }
+        
     }
     function extend(obj1,obj2){
         for(var attr in obj2){
