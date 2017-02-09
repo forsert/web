@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        *{margin:0;padding:0;}
+        li{list-style:none;}
+        #box {width:330px;margin:100px 100px;background:#000;position:relative;}
+        #box li{width:100px;height:100px;overflow:hidden;float:left;margin:5px;*zoom:1;position:relative;}
+        #box li img{height:100px;width:auto;}
+        #box:after{display:block;visibility:hidden;clear:both;font-size:0;height:0;content:" ";}
+    </style>
+</head>
+<body>
+<ul id="box" >
+    <li><img src="img/2.jpg"></li>
+    <li><img src="img/3.jpg"></li>
+    <li><img src="img/4.jpg"></li>
+    <li><img src="img/5.jpg"></li>
+    <li><img src="img/6.jpg"></li>
+    <li><img src="img/7.jpg"></li>
+    <li><img src="img/8.jpg"></li>
+    <li><img src="img/9.jpg"></li>
+    <li><img src="img/10.jpg"></li>
+</ul>
+<script>
+    function MoveEvent(){
+        this.default={
+            bg:"#000",
+            opacity:".6"
+        }
+    };
+    MoveEvent.prototype={
+        init:function(opt){
+            extend(this.default,opt);
+            this.getElement()
+        },
+        getElement:function(){
+            this.id=document.getElementById(this.default.id);
+            this.id.style.position="relative";
+            this.child=this.id.getElementsByTagName("li");
+            this.event();
+        },
+        event:function(){
+            var This=this;
+            for(var i=0,j=this.child.length;i<j;i++){
+                this.child[i].onmouseover=function(e){
+                    var ev=e || window.event;
+                    var numprice={
+                        width:this.offsetWidth,
+                        height:this.offsetHeight,
+                        x:ev.clientX,
+                        y:ev.clientY,
+                        l:this.offsetLeft,
+                        t:this.offsetTop,
+                        parentL:This.id.offsetLeft,
+                        parentT:This.id.offsetTop
+                    };
+                    var disx=numprice.x-numprice.parentL-numprice.l;
+                    var disy=numprice.y-numprice.parentT-numprice.t;
+                    var x=disx-(numprice.width/2)*(numprice.width>numprice.height?(numprice.height/numprice.width):1);
+                    var y=disy-(numprice.height/2)*(numprice.height>numprice.width?(numprice.width/numprice.height):1);
+                    This.direction = Math.round((((Math.atan2(y, x) * (180 / Math.PI)) + 180) / 90) + 3) % 4;
+                    This.create(this)
+                }
+            }
+        },
+        create:function(em){
+            var dir=[
+                    {top:"-100%",left:"0"},
+                    {top:0,left:"100%"},
+                    {left:0,top:"100%"},
+                    {left:"-100%",top:0}
+                ]
+            
+            div=document.createElement("div");
+            // console.log(dir[this.direction].top);
+             div.style.cssText="position:absolute;top:"+dir[this.direction].top+";left:"+dir[this.direction].left+";background:#ccc;width:100%;height:100%";
+            em.appendChild(div);
+            this.setTime(div,em);
+        },
+        setTime:function(div,em){
+            if(div.offsetLeft!=0){
+                // var timer=setInterval(function(){
+                //     div.style.left=div.offsetLeft
+                // },30)
+            }
+        }
+    }
+    var t=new MoveEvent();
+    t.init({id:"box"})
+    function extend(obj1,obj2){
+        for(var attr in obj2){
+            obj1[attr]=obj2[attr]
+        }
+    }
+</script>
+</body>
+</html>
