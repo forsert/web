@@ -4,113 +4,91 @@
 </head>
 <body>
 <script>
-    window.onload=function(){
-        var t=new sid();
-        t.init({
-            id:"silid",
-        })
-    }
-    function sid(){
+    function Address(){
+        this.bank='http://www.huanghanlian.com/data_location/list.json';
+        this.shi=0;
+        this.qu=0;
+        this.ip=null;
+        this.load=0;
         this.default={
-            id:"silid",
-            tierDisplay:false
-        }
+            province:"安徽",
+            town:"芜湖"
+            
+        };
     };
-    sid.prototype={
+    Address.prototype={
         init:function(opt){
+            var This=this;
+            this.el=document.getElementById(opt.id).getElementsByTagName('select');
             extend(this.default,opt);
-            this.id=document.getElementById(this.default.id);
-            this.select=this.id.getElementsByTagName("select");
-            if(this.default.tierDisplay){
-                this.tier();
-            };
-            this.ip();
-        },
-        ip:function(){
-            var This=this;
-            var script=document.createElement("script");
-            script.src="http://pv.sohu.com/cityjson?ie=utf-8";
-            document.body.appendChild(script);
-            script.onload = script.onreadystatechange = function() {
-                if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete" ) {
-                var s=returnCitySN.cname;
-                 s=s.substr(0,s.length-1);
-                This.default.province=This.default.province || s;
-                This.ajax();
-                This.chang();
-                script.onload = script.onreadystatechange = null;
-                }
-            }
-        },
-        ajax:function(){
-            var This=this;
-            ajax({type:"GET",url:"http://www.huanghanlian.com/data_location/list.json"},function(msg){
-                This.order(JSON.parse(msg));
+            ajax({type:"get",url:this.bank},function(msg){
+                This.province(JSON.parse(msg))
             });
+            this.change();
         },
-        order:function(msg){
-            var This=this;
-            var html="";
-            var index=null;
+        province:function(msg){
             this.msg=msg;
-            for(var i=0;i<this.msg.length;i++){
-                if(this.default.province==this.msg[i].name){
-                    index=i;
+            var html="",
+                reg=new RegExp(this.default.province),
+                content=this.msg;
+              this.el[0].innerHTML="";  
+            for(var i=0,j=content.length;i<j;i++){
+                if(reg.test(content[i].name)){
+                    this.el[0].innerHTML="<option index="+i+">"+content[i].name+"</option>";
+                    this.shi=i;
                 }else{
-                    html+="<option name="+i+">"+this.msg[i].name+"</option>";
-                };
+                    html+="<option index="+i+">"+content[i].name+"</option>"
+                }
             };
-            this.select[0].innerHTML="<option name="+index+">"+this.msg[index].name+"</option>"
-            this.select[0].innerHTML+=html;
-            this.pro=this.select[0].options[0].getAttribute("name");
-            this.city(this.msg)
-            this.qu(this.msg)
+            this.el[0].innerHTML+=html;
+            this.city();
         },
         city:function(){
-            var cityhtml="";
-            for(var i=0;i<this.msg[this.pro].city.length;i++){
-                cityhtml+="<option name="+i+">"+this.msg[this.pro].city[i].name+"</option>"
+            this.el[1].innerHTML="";
+            var html="",
+                reg=new RegExp(this.default.town),
+                content=this.msg[this.shi].city;
+            for(var i=0,j=content.length;i<j;i++){
+                if(reg.test(content[i].name)){
+                    this.el[1].innerHTML="<option index="+i+">"+content[i].name+"</option>";
+                    this.qu=i;
+                }else{
+                    html+="<option index="+i+">"+content[i].name+"</option>"
+                }
             };
-            this.select[1].innerHTML=cityhtml;
+            this.el[1].innerHTML+=html;
+            this.region();
         },
-        qu:function(){
-            var districthtml="";
-            for(var i=0;i<this.msg[this.pro].city[0].area.length;i++){
-                districthtml+="<option name="+i+">"+this.msg[this.pro].city[0].area[i]+"</option>";
-            }
-            this.select[2].innerHTML=districthtml;
-        }
-        ,
-        chang:function(){
+        region:function(){
+            this.el[2].innerHTML="";
+            var html="",
+            content=this.msg[this.shi].city[this.qu].area;
+            for(var i=0,j=content.length;i<j;i++){
+                html+="<option index="+i+">"+content[i]+"</option>";
+            };
+            this.el[2].innerHTML=html;
+                        
+        },
+        change:function(){
             var This=this;
-            this.select[0].onchange=function(){
-                This.pro=this.options[this.options.selectedIndex].getAttribute("name");
-                This.city();
-                This.qu();
-                if(This.default.tierDisplay){
-                    This.select[1].style.display="inline";
-                };
-                
+            this.el[0].onchange=function(){
+                This.shi=this.options[this.options.selectedIndex].getAttribute("index");
+                This.qu=0;
+                This.city()
             };
-            this.select[1].onchange=function(){
-                 This.pro=this.options[this.options.selectedIndex].getAttribute("name");
-                 This.qu();
-                 if(This.default.tierDisplay){
-                    This.select[2].style.display="inline";
-                };
+            this.el[1].onchange=function(){
+                This.qu=this.options[this.options.selectedIndex].getAttribute("index");
+                This.region();
             }
-        },
-        tier:function(){
-            this.select[1].style.display=this.select[2].style.display="none";
-            
         }
         
-    }
+    };
     function extend(obj1,obj2){
         for(var attr in obj2){
             obj1[attr]=obj2[attr]
         }
     };
+    
      function ajax(opt,fn){
         var xhr=window.XMLHttpRequest?new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
         xhr.onreadystatechange=function(){
@@ -124,6 +102,10 @@
         };
          xhr.open(opt.type,opt.url,true);
          xhr.send(null);
+     }
+     window.onload=function(){
+       var t=new Address();
+        t.init({id:"silid",province:"湖北"});
      }
 </script>
 <div id="silid">
