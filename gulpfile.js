@@ -15,45 +15,38 @@ gulp.task('default',function(){
 gulp.task('minjs', function () {
     gulp.src('js/*.js') 
         .pipe(uglify()) 
-        .pipe(gulp.dest('dist/js'))
-        .pipe(browserSync.reload({
-            stream:true
-        }));
+        .pipe(gulp.dest('dist/js'));
 });
 //压缩css
 gulp.task('mincss',function(){
     gulp.src('css/*.css')
         .pipe(Mincss())
-        .pipe(gulp.dest('dist/css'))
-        .pipe(browserSync.reload({
-            stream:true
-        }));
+        .pipe(gulp.dest('dist/css'));
 });
 //移动html
 gulp.task('html',function(){
     gulp.src("*.html")
-        .pipe(gulp.dest('dist'))
-        .pipe(browserSync.reload({
-            stream:true
-        }));
+        .pipe(gulp.dest('dist'));
 });
 //编译sass
 gulp.task('sass', function () {
     gulp.src('sass/*.scss')
         .pipe(Sass())
-        .pipe(gulp.dest('css'))
-        .pipe(browserSync.reload({
-            stream:true
-        }));
+        .pipe(gulp.dest('css'));
 });
 //合并js
 gulp.task('concatjs',function(){
     gulp.src('js/*.js')
-        .pipe(Concat('index.js'))
-        .pipe(gulp.dest("dist/js"))
-        .pipe(browserSync.reload({
-            stream:true
-        }));
+        .pipe(Concat('common.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest("dist/js"));
+});
+//合并css
+gulp.task('concatcss',function(){
+    gulp.src('css/*.css')
+        .pipe(Concat('common.css'))
+        .pipe(Mincss())
+        .pipe(gulp.dest("dist/css"));
 });
 
 //压缩img
@@ -66,17 +59,17 @@ gulp.task('img',function(){
        }))
        .pipe(gulp.dest("dist/img")); 
 });
-//监控修改记录
+//自动刷新
 gulp.task('watch',function(){
     browserSync.init({
         server:{
             baseDir:['./']
         }
     });
-    gulp.watch('sass/*.scss',['sass']);
-    gulp.watch('css/*.css',['mincss']);
-    gulp.watch('*.html',['html']);
-    gulp.watch('js/*.js',['minjs']);
+    gulp.watch('sass/*.scss',['sass']).on('change',browserSync.reload);
+    gulp.watch('*.html').on('change',browserSync.reload);
+    gulp.watch('js/*.js').on('change',browserSync.reload);
+    gulp.watch('css/*.css').on('change',browserSync.reload);
 });
 //合并雪碧图
 gulp.task('speed', function() {
@@ -85,5 +78,9 @@ gulp.task('speed', function() {
             'spriteSheet': 'img/spritesheet.png', 
             'pathToSpriteSheetFromCSS': '../img/spritesheet.png'
         }))
-        .pipe(gulp.dest('/css'));
+        .pipe(gulp.dest('css'));
 });
+//打包压缩
+gulp.task("bale",['minjs','mincss','html','img']);
+//打包压缩
+gulp.task("combine",['concatjs','concatcss','html','img']);
